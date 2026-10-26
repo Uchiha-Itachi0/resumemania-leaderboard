@@ -26,7 +26,7 @@ CAMPAIGNS = (
     ("02-ai-engineer.txt", "AI Engineer (Fresher)", "All branches, batch 2026", 65),
     ("03-frontend-react.txt", "Frontend Developer, React", "CSE and IT, batch 2026", 60),
     ("04-backend-java.txt", "Backend Engineer, Java", "CSE, batch 2026", 60),
-    ("05-ml-engineer-recsys.txt", "ML Engineer, Recommendations", "M.Sc. and B.Tech, batch 2026", 70),
+    ("05-ml-engineer-recsys.txt", "ML Engineer, Recommendations", "M.Sc. and B.Tech, batch 2026", 60),
     ("06-product-analyst.txt", "Product Analyst", "All branches and MBA, batch 2026", 55),
     ("07-cloud-devops-intern.txt", "Cloud and DevOps Intern", "ECE, EEE and CSE, batch 2026", 55),
     ("08-android-developer.txt", "Android Developer, Kotlin", "CSE and IT, batch 2026", 60),
@@ -34,6 +34,7 @@ CAMPAIGNS = (
     ("10-cybersecurity-intern.txt", "Cybersecurity Analyst Intern", "CSE and IT, batch 2026", 60),
 )
 PARALLEL = 5
+SAMPLE_SHARE = 0.25  # sample campaigns show the top 25% so the demo board has several names
 
 
 def main() -> None:
@@ -48,11 +49,13 @@ def main() -> None:
     def create(entry: tuple[str, str, str, int]) -> str:
         file, title, cohort, benchmark = entry
         jd = (ROOT / "samples" / "jds" / file).read_text()
-        campaign = service.create_campaign(title, jd, cohort, benchmark)
+        campaign = service.create_campaign(title, jd, cohort, benchmark, public_share=SAMPLE_SHARE)
         return f"created  {title} ({len(campaign.job.requirements)} requirements, benchmark {benchmark}%)"
 
-    for title in sorted(existing & {c[1] for c in CAMPAIGNS}):
-        print(f"skipped  {title} (already exists)")
+    for campaign in service.campaigns():
+        if campaign.title in {c[1] for c in CAMPAIGNS}:
+            service.set_public_share(campaign.id, SAMPLE_SHARE)
+            print(f"kept     {campaign.title} (already exists; public board set to top 25%)")
     with ThreadPoolExecutor(PARALLEL) as pool:
         for line in pool.map(create, todo):
             print(line)

@@ -5,7 +5,7 @@
 Post one job. Students send resumes. See who fits, ranked fairly and kept private.
 
 - Every score shows its evidence: the exact line in the resume behind each requirement
-- Only the top 10% go public, and only by GitHub username
+- Only the top students go public (top 10% by default, set per campaign), and only by GitHub username
 - Below the bar stays private: a student's score is shown to that student and nobody else
 
 No accounts. A student's ID is the `github.com/username` link in their resume. Uploading again with the same link replaces their old entry. A resume without a GitHub link is turned away with a clear message.
@@ -43,9 +43,9 @@ Ten sample job descriptions and ten fictional student resumes come with the repo
 python scripts/seed_campaigns.py
 ```
 
-That creates ten campaigns (Data Analyst, AI Engineer, Frontend, Java Backend, ML, Product Analyst, DevOps, Android, MERN and Cybersecurity) from `samples/jds/`. It takes a few seconds and is safe to run twice.
+That creates ten campaigns, each showing the top 25% on its public board (Data Analyst, AI Engineer, Frontend, Java Backend, ML, Product Analyst, DevOps, Android, MERN and Cybersecurity) from `samples/jds/`. It takes a few seconds and is safe to run twice.
 
-To fill every campaign with results, submit all ten sample resumes to all ten campaigns. By default this runs **offline, with no AI calls**: a keyword-matching stand-in (`scripts/offline_llm.py`) replaces Gemini, and everything after it (validation gate, scoring, ranking, leaderboard) is the real code. It takes about 2 seconds:
+To fill every campaign with results, submit the ten sample resumes plus 80 generated students (eight per job, from strong to weak) to all ten campaigns. By default this runs **offline, with no AI calls**: a keyword-matching stand-in (`scripts/offline_llm.py`) replaces Gemini, and everything after it (validation gate, scoring, ranking, leaderboard) is the real code. It takes about 2 seconds:
 
 ```bash
 python scripts/seed_resumes.py
@@ -81,7 +81,7 @@ Shown = full credit, partly shown = half, not shown = none. If a job has no asks
 | Irrelevant | Shows none of the job's requirements | Not ranked. Private explanation |
 | Below | Under the benchmark (default 60%) | Score visible to the student only. Never named anywhere |
 | Eligible | At or above the benchmark | Ranked. The dashboard lists them for guidance |
-| Public | Top 10% of eligible, rounded up, at least 1 | Shown on the leaderboard by GitHub username |
+| Public | Top share of eligible (10% by default; 25%, 50% or everyone per campaign), rounded up, at least 1 | Shown on the leaderboard by GitHub username |
 
 **Ties:** higher score first, then a higher required-skills component, then the earlier upload.
 **Recalculation:** every upload recalculates the campaign's ranking and saves a snapshot.

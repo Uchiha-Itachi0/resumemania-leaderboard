@@ -274,3 +274,43 @@ def test_create_campaign_validates_inputs(storage, jd_text):
         svc.create_campaign("Valid title", jd_text, benchmark=120)
     with pytest.raises(IngestError, match="job description"):
         svc.create_campaign("Valid title", "short")
+
+
+# ---------- public share ----------
+
+
+@pytest.mark.parametrize(("eligible", "share", "shown"), [(10, 0.25, 3), (10, 0.5, 5), (10, 1.0, 10), (3, 0.25, 1)])
+def test_public_count_respects_share(eligible, share, shown):
+    assert public_count(eligible, share) == shown
+
+
+def test_public_count_rejects_bad_share():
+    with pytest.raises(ValueError):
+        public_count(5, 0)
+
+
+def test_changing_public_share_reranks(campaign_setup, resume_text):
+    svc, switch, job, campaign = campaign_setup
+    for handle in ("asha", "ben", "cara", "dev"):
+        _submit(svc, switch, job, handle, campaign, {"R1": M, "R2": M, "R3": M}, resume_text)
+    assert len(svc.leaderboard(campaign.id)[0]) == 1  # 10% of 4, rounded up
+    svc.set_public_share(campaign.id, 0.5)
+    assert len(svc.leaderboard(campaign.id)[0]) == 2
+    svc.set_public_share(campaign.id, 1.0)
+    assert len(svc.leaderboard(campaign.id)[0]) == 4
+    with pytest.raises(Exception, match="public leaderboard"):
+        svc.set_public_share(campaign.id, 0.33)
+
+
+def test_old_database_gets_public_share_column(tmp_path):
+    import sqlite3
+
+    from resumemania.storage import Storage
+
+    db = tmp_path / "old.db"
+    with sqlite3.connect(db) as conn:
+        conn.execute("CREATE TABLE campaigns (id INTEGER PRIMARY KEY, title TEXT NOT NULL, job_description TEXT"
+                     " NOT NULL, requirements_json TEXT NOT NULL, cohort TEXT NOT NULL DEFAULT '', benchmark"
+                     " INTEGER NOT NULL, weights_json TEXT NOT NULL, created_at TEXT NOT NULL)")
+        conn.execute("INSERT INTO campaigns VALUES (1, 't', 'jd', '{}', '', 60, '{}', 'now')")
+    assert Storage(db).get_campaign(1).public_share == 0.1

@@ -17,7 +17,7 @@ from .agents import Models
 from .ingest import ExtractedText, IngestError, validate_jd
 from .llm import LLMError, StructuredLLM
 from .pipeline import run_analysis
-from .ranking import DEFAULT_BENCHMARK, Entry, Status, eligibility, rank
+from .ranking import DEFAULT_BENCHMARK, PUBLIC_SHARE, PUBLIC_SHARE_OPTIONS, Entry, Status, eligibility, rank
 from .redact import redact_pii
 from .schemas import Analysis, MatchStatus
 from .storage import Campaign, Evaluation, Snapshot, Storage, Submission, now
@@ -80,18 +80,29 @@ class CampaignService:
 
     # ---------- campaigns ----------
 
-    def create_campaign(self, title: str, jd_text: str, cohort: str = "",
-                        benchmark: int = DEFAULT_BENCHMARK, weights: dict[str, int] | None = None) -> Campaign:
+    def create_campaign(self, title: str, jd_text: str, cohort: str = "", benchmark: int = DEFAULT_BENCHMARK,
+                        weights: dict[str, int] | None = None, public_share: float = PUBLIC_SHARE) -> Campaign:
         if len(title.strip()) < MIN_TITLE:
             raise IngestError("Give the campaign a title, like 'Data Analyst Intern 2026'.")
         if not 0 <= benchmark <= 100:
             raise IngestError("The benchmark must be between 0 and 100.")
+        if public_share not in PUBLIC_SHARE_OPTIONS:
+            raise IngestError("Pick how many students the public leaderboard shows.")
         config = ScoringConfig(weights=weights or ScoringConfig().weights)
         validate_jd(jd_text)
         job = agents.analyze_jd(self._llm(), self._models, jd_text, title)
         if not job.requirements:
             raise IngestError("We couldn't find any requirements in that job description.")
-        return self._store.create_campaign(title.strip(), jd_text, job, cohort.strip(), benchmark, config.weights)
+        return self._store.create_campaign(title.strip(), jd_text, job, cohort.strip(), benchmark, config.weights,
+                                           public_share)
+
+    def set_public_share(self, campaign_id: int, public_share: float) -> Snapshot:
+        """Change how many students the public board shows, then re-rank."""
+        self.campaign(campaign_id)
+        if public_share not in PUBLIC_SHARE_OPTIONS:
+            raise IngestError("Pick how many students the public leaderboard shows.")
+        self._store.set_public_share(campaign_id, public_share)
+        return self.recalculate(campaign_id)
 
     def campaigns(self) -> list[Campaign]:
         return self._store.list_campaigns()
@@ -178,12 +189,13 @@ class CampaignService:
         return evaluation
 
     def recalculate(self, campaign_id: int) -> Snapshot:
+        campaign = self.campaign(campaign_id)
         entries = []
         for sub in self._store.submissions(campaign_id):
             ev = self._store.get_evaluation(sub.id)
             if ev and ev.status == Status.ELIGIBLE.value:
                 entries.append(Entry(sub.id, ev.score, ev.required_component, sub.created_at))
-        ranking = rank(entries)
+        ranking = rank(entries, campaign.public_share)
         snapshot = Snapshot(campaign_id, now(), ranking.ordered_ids, ranking.visible_ids, RANKING_VERSION)
         self._store.save_snapshot(snapshot)
         return snapshot

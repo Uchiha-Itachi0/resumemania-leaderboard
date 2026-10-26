@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS campaigns (
     cohort TEXT NOT NULL DEFAULT '',
     benchmark INTEGER NOT NULL,
     weights_json TEXT NOT NULL,
+    public_share REAL NOT NULL DEFAULT 0.1,
     created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS submissions (
@@ -73,6 +74,7 @@ class Campaign:
     benchmark: int
     weights: dict[str, int]
     created_at: str
+    public_share: float = 0.1
 
 
 @dataclass(frozen=True)
@@ -116,6 +118,7 @@ class Storage:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with self._connect() as conn:
             conn.executescript(SCHEMA)
+            _migrate(conn)
 
     @contextmanager
     def _connect(self) -> Iterator[sqlite3.Connection]:
@@ -134,15 +137,21 @@ class Storage:
     # ---------- campaigns ----------
 
     def create_campaign(self, title: str, job_description: str, job: JobRequirements, cohort: str,
-                        benchmark: int, weights: dict[str, int]) -> Campaign:
+                        benchmark: int, weights: dict[str, int], public_share: float = 0.1) -> Campaign:
         created = now()
         with self._connect() as conn:
             cur = conn.execute(
                 "INSERT INTO campaigns (title, job_description, requirements_json, cohort, benchmark,"
-                " weights_json, created_at) VALUES (?,?,?,?,?,?,?)",
-                (title, job_description, job.model_dump_json(), cohort, benchmark, json.dumps(weights), created),
+                " weights_json, public_share, created_at) VALUES (?,?,?,?,?,?,?,?)",
+                (title, job_description, job.model_dump_json(), cohort, benchmark, json.dumps(weights),
+                 public_share, created),
             )
-        return Campaign(cur.lastrowid, title, job_description, job, cohort, benchmark, weights, created)
+        return Campaign(cur.lastrowid, title, job_description, job, cohort, benchmark, weights, created,
+                        public_share)
+
+    def set_public_share(self, campaign_id: int, public_share: float) -> None:
+        with self._connect() as conn:
+            conn.execute("UPDATE campaigns SET public_share = ? WHERE id = ?", (public_share, campaign_id))
 
     def get_campaign(self, campaign_id: int) -> Campaign | None:
         with self._connect() as conn:
@@ -223,7 +232,15 @@ def _campaign(row: sqlite3.Row) -> Campaign:
         id=row["id"], title=row["title"], job_description=row["job_description"],
         job=JobRequirements.model_validate_json(row["requirements_json"]), cohort=row["cohort"],
         benchmark=row["benchmark"], weights=json.loads(row["weights_json"]), created_at=row["created_at"],
+        public_share=row["public_share"],
     )
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Add columns introduced after a database was first created."""
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(campaigns)")}
+    if "public_share" not in columns:
+        conn.execute("ALTER TABLE campaigns ADD COLUMN public_share REAL NOT NULL DEFAULT 0.1")
 
 
 def _submission(row: sqlite3.Row) -> Submission:

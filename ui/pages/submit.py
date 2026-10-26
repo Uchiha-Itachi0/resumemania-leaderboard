@@ -59,7 +59,8 @@ def _result(result: StudentResult) -> None:
          f"@{esc(result.submission.github_username)} · {esc(result.campaign.title)}</span><h1>{head}</h1>"
          f"<p>{esc(ev.message)}</p></div>")
     if ev.status in ("eligible", "below"):
-        public = copy.PUBLIC_YES if result.on_public_board else copy.PUBLIC_NO
+        share = copy.SHARE_SHORT[result.campaign.public_share]
+        public = copy.PUBLIC_YES if result.on_public_board else copy.PUBLIC_NO.format(share=share)
         tiles = [
             stat_tile("Your score", f"{ev.score}%", sub=f"Benchmark {result.campaign.benchmark}%", bar=ev.score / 100),
             stat_tile("Your rank", f"#{result.rank}" if result.rank else "Not ranked",

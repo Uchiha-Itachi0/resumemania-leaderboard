@@ -1,4 +1,4 @@
-"""Public leaderboard: top 10% of eligible students only, nothing about anyone else."""
+"""Public leaderboard: the campaign's top share of eligible students only, nothing about anyone else."""
 
 from __future__ import annotations
 
@@ -8,17 +8,23 @@ from resumemania import github
 from ui import copy, state
 from ui.components import avatar, esc, html, page_title
 from ui.picker import pick_campaign
+from ui.resume_view import resume_html
 
 
 def render() -> None:
     state.show_flash()
     campaign = pick_campaign()
     if campaign is None:
-        page_title("Leaderboard", copy.BOARD_TITLE, copy.NO_CAMPAIGN_YET)
+        page_title("Leaderboard", "The <em>leaderboard.</em>", copy.NO_CAMPAIGN_YET)
         return
-    rows, eligible = state.service().leaderboard(campaign.id)
-    page_title(copy.BOARD_EYEBROW.format(title=campaign.title), copy.BOARD_TITLE,
-               copy.BOARD_SUB.format(eligible=eligible, benchmark=campaign.benchmark, shown=len(rows)))
+    svc = state.service()
+    rows, eligible = svc.leaderboard(campaign.id)
+    submitted = svc.dashboard(campaign.id).submitted
+    share = campaign.public_share
+    title = copy.BOARD_TITLE_ALL if share >= 1 else copy.BOARD_TITLE.format(share=copy.SHARE_SHORT[share])
+    page_title(copy.BOARD_EYEBROW.format(title=campaign.title), title,
+               copy.BOARD_SUB.format(eligible=eligible, submitted=submitted, benchmark=campaign.benchmark,
+                                     share=copy.SHARE_SHORT[share], shown=len(rows)))
     html("<div style='height:18px'></div>")
     if not rows:
         st.info(copy.BOARD_EMPTY)
@@ -37,7 +43,7 @@ def render() -> None:
             )
             if row.shared_resume:
                 with st.expander(copy.SEE_RESUME):
-                    st.text(row.shared_resume)
+                    html(resume_html(row.shared_resume, row.github_username))
 
 
 render()

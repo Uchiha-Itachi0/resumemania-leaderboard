@@ -40,17 +40,19 @@ def _create_form() -> None:
         jd = st.text_area(copy.CAMP_JD, placeholder=copy.CAMP_JD_HINT, height=220, key="camp_jd")
         benchmark = st.slider(copy.CAMP_BENCHMARK, 0, 100, DEFAULT_BENCHMARK, step=5, format="%d%%",
                               help=copy.CAMP_BENCHMARK_HELP, key="camp_benchmark")
+        share = st.selectbox(copy.SHARE_LABEL, list(copy.SHARE_OPTIONS), format_func=copy.SHARE_OPTIONS.get,
+                             help=copy.SHARE_HELP, key="camp_share")
         weights = _weights()
         st.caption(copy.CAMP_PRIVACY)
         ready = sum(weights.values()) == WEIGHT_TOTAL
         if st.button(copy.CTA_COORD, type="primary", use_container_width=True, disabled=not ready):
-            _create(title, jd, cohort, benchmark, weights)
+            _create(title, jd, cohort, benchmark, weights, share)
 
 
-def _create(title: str, jd: str, cohort: str, benchmark: int, weights: dict[str, int]) -> None:
+def _create(title: str, jd: str, cohort: str, benchmark: int, weights: dict[str, int], share: float) -> None:
     try:
         with st.spinner(copy.CAMP_CREATING):
-            campaign = state.service().create_campaign(title, jd, cohort, benchmark, weights)
+            campaign = state.service().create_campaign(title, jd, cohort, benchmark, weights, share)
     except (IngestError, LLMError, ValueError) as exc:
         st.error(str(exc))
         return
@@ -69,7 +71,8 @@ def _campaign_card(campaign) -> None:
                 f"<div style='display:flex;flex-direction:column;gap:6px;padding:2px 0 6px'>"
                 f"<span style='font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.03em'>"
                 f"{esc(campaign.title)}</span>"
-                f"<span class='rm-muted'>Benchmark {campaign.benchmark}%{cohort}</span>"
+                f"<span class='rm-muted'>Benchmark {campaign.benchmark}% · public board "
+                f"{copy.SHARE_OPTIONS[campaign.public_share].lower()}{cohort}</span>"
                 f"<span style='display:flex;gap:6px;flex-wrap:wrap;margin-top:4px'>"
                 f"{pill(_plural(dash.submitted, 'resume'), 'mono')}{pill(f'{len(dash.candidates)} at benchmark', 'good')}"
                 f"</span></div>"

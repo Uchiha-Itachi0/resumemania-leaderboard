@@ -1,6 +1,7 @@
 """Submit every sample resume to every campaign, so dashboards and leaderboards have data.
 
     python scripts/seed_resumes.py            # offline: no AI calls, a few seconds
+    python scripts/seed_resumes.py --only-files  # just the 10 resume files, not the generated 80
     python scripts/seed_resumes.py --live     # real Gemini: about 4 calls per resume per campaign
     python scripts/seed_resumes.py --limit 3  # only the first 3 campaigns
 
@@ -23,24 +24,29 @@ sys.path.insert(0, str(ROOT))
 
 from resumemania.agents import Models  # noqa: E402
 from resumemania.config import load_settings  # noqa: E402
-from resumemania.ingest import ExtractedText, extract_text  # noqa: E402
+from resumemania.ingest import ExtractedText, extract_text, from_paste  # noqa: E402
 from resumemania.llm import GeminiLLM  # noqa: E402
 from resumemania.service import FAILED, CampaignService  # noqa: E402
 from resumemania.storage import Storage  # noqa: E402
 from scripts.offline_llm import OfflineLLM  # noqa: E402
+from scripts.sample_resumes import generated_cohort, to_text  # noqa: E402
 
 PARALLEL = 3
 RETRY_PAUSE_SECONDS = 20
 MAX_ROUNDS = 3
 
 
-def _load_resumes() -> list[tuple[str, ExtractedText]]:
+def _load_resumes(only_files: bool) -> list[tuple[str, ExtractedText]]:
+    """The 10 sample resume files, plus 80 generated students unless only_files."""
     folder = ROOT / "samples" / "resumes"
-    return [(p.name, extract_text(p.name, p.read_bytes(), 5)) for p in sorted(folder.iterdir())
-            if p.suffix in (".pdf", ".docx")]
+    resumes = [(p.name, extract_text(p.name, p.read_bytes(), 5)) for p in sorted(folder.iterdir())
+               if p.suffix in (".pdf", ".docx")]
+    if not only_files:
+        resumes += [(f"{r['file']} (generated)", from_paste(to_text(r))) for r in generated_cohort()]
+    return resumes
 
 
-def main(limit: int | None, live: bool) -> None:
+def main(limit: int | None, live: bool, only_files: bool) -> None:
     settings = load_settings()
     if live:
         llm = GeminiLLM(settings.require_api_key(), fallback_models=settings.fallback_models,
@@ -50,7 +56,7 @@ def main(limit: int | None, live: bool) -> None:
     service = CampaignService(Storage(settings.db_path), lambda: llm,
                               Models(fast=settings.fast_model, smart=settings.smart_model))
     campaigns = service.campaigns()[:limit] if limit else service.campaigns()
-    resumes = _load_resumes()
+    resumes = _load_resumes(only_files)
     if not campaigns:
         sys.exit("No campaigns yet. Run scripts/seed_campaigns.py first.")
 
@@ -85,5 +91,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--limit", type=int, default=None, help="Only the first N campaigns")
     parser.add_argument("--live", action="store_true", help="Use real Gemini instead of the offline stand-in")
+    parser.add_argument("--only-files", action="store_true", help="Skip the 80 generated students")
     args = parser.parse_args()
-    main(args.limit, args.live)
+    main(args.limit, args.live, args.only_files)

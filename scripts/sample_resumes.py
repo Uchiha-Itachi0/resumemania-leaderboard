@@ -7,6 +7,8 @@ resumes are deliberately weaker (vague bullets, no numbers) so the feedback has 
 
 from __future__ import annotations
 
+import zlib
+
 RESUMES: list[dict] = [
     {
         "file": "aarav-mehta-data-analyst",
@@ -314,3 +316,93 @@ RESUMES: list[dict] = [
                    "Responsible disclosure: 2 acknowledged bugs in university web portals"],
     },
 ]
+
+
+# ---------- a bigger generated cohort for demos ----------
+
+FIRST_NAMES = (
+    "Aditi", "Rahul", "Sana", "Karan", "Pooja", "Nikhil", "Riya", "Siddharth", "Tanvi", "Yash",
+    "Kavya", "Omkar", "Nisha", "Harsh", "Zara", "Manav", "Divya", "Pranav", "Ira", "Varun",
+    "Shreya", "Aman", "Mitali", "Kunal", "Anjali", "Dev", "Simran", "Aryan", "Lavanya", "Ritesh",
+    "Neha", "Farhan", "Gauri", "Ishaan", "Payal", "Tejas", "Bhavna", "Rohit", "Sakshi", "Vivek",
+    "Aisha", "Chirag", "Esha", "Jay", "Komal", "Mohit", "Naina", "Parth", "Ruchi", "Suraj",
+)
+LAST_NAMES = (
+    "Sharma", "Verma", "Patel", "Rao", "Nair", "Das", "Kulkarni", "Menon", "Bose", "Chopra",
+    "Gill", "Desai", "Pandey", "Shetty", "Kapoor", "Saxena", "Pillai", "Mishra", "Bhat", "Sinha",
+)
+# A realistic class: most applicants are decent, a few are strong, a couple are weak.
+LEVELS = ("strong", "strong", "solid", "solid", "good", "good", "medium", "weak")
+VARIANTS_PER_ARCHETYPE = len(LEVELS)
+
+
+def _trim(text: str, keep: float, rng) -> str:
+    """Keep roughly `keep` of the comma-separated items in a skills line."""
+    items = [i.strip() for i in text.split(",")]
+    count = max(1, round(len(items) * keep))
+    return ", ".join(sorted(rng.sample(items, count), key=items.index))
+
+
+def _variant(base: dict, level: str, first: str, last: str, rng) -> dict:
+    # Stable username from the name, so tweaking the variation never renames a student.
+    handle = f"{first}-{last}-{zlib.crc32(f'{first}{last}'.encode()) % 90 + 10}".lower()
+    keep_bullets = {"strong": 99, "solid": 99, "good": 2, "medium": 1, "weak": 0}[level]
+    keep_skills = {"strong": 1.0, "solid": 0.85, "good": 0.75, "medium": 0.6, "weak": 0.35}[level]
+    # Natural variation so two students at the same level don't score identically.
+    keep_skills = max(0.2, keep_skills - rng.uniform(0, 0.25))
+    experience = [] if level == "weak" else [
+        (t, o, d, rng.sample(b, max(1, min(len(b), keep_bullets) - rng.randint(0, 1))))
+        for t, o, d, b in base["experience"]
+    ]
+    projects = rng.sample(base["projects"], min(len(base["projects"]), rng.choice((1, 2)) if level != "weak" else 1))
+    projects = [(n, link.replace(link.split("/")[1], handle), b[:max(1, keep_bullets)]) for n, link, b in projects]
+    return base | {
+        "file": f"{first}-{last}".lower(),
+        "name": f"{first} {last}",
+        "contact": f"{base['contact'].split(' · ')[0]} · +91 90000 2{rng.randint(1000, 9999)} · "
+                   f"{first.lower()}.{last.lower()}@example.com · github.com/{handle}",
+        "summary": base["summary"] if experience else
+                   f"Final-year student looking for {base['headline'].split(' · ')[0]} roles. Learning by building projects.",
+        "experience": experience,
+        "projects": projects,
+        "skills": {k: _trim(v, keep_skills, rng) for k, v in base["skills"].items()},
+        "extras": base["extras"][:1] if level in ("strong", "solid") else [],
+    }
+
+
+def generated_cohort(seed: int = 2026) -> list[dict]:
+    """Eighty extra fictional students: eight per archetype, mostly decent, a few strong or weak."""
+    import itertools
+    import random
+
+    rng = random.Random(seed)
+    pairs = list(itertools.product(FIRST_NAMES, LAST_NAMES))
+    rng.shuffle(pairs)
+    names = iter(pairs)
+    cohort = []
+    for base in RESUMES:
+        for level in LEVELS:
+            first, last = next(names)
+            cohort.append(_variant(base, level, first, last, rng))
+    return cohort
+
+
+def to_text(r: dict) -> str:
+    """The same resume as plain text, the way a PDF reads after extraction."""
+    lines = [r["name"], r["headline"], r["contact"], "SUMMARY", r["summary"]]
+    if r["experience"]:
+        lines.append("EXPERIENCE")
+        for title, org, dates, bullets in r["experience"]:
+            lines += [f"{title} · {org}", dates, *[f"• {b}" for b in bullets]]
+    lines.append("PROJECTS")
+    for name, link, bullets in r["projects"]:
+        lines += [name, link, *[f"• {b}" for b in bullets]]
+    lines.append("SKILLS")
+    lines += [f"{k}: {v}" for k, v in r["skills"].items()]
+    lines.append("EDUCATION")
+    lines += [f"{deg} · {school} · {dates}" + (f" · {extra}" if extra else "")
+              for deg, school, dates, extra in r["education"]]
+    if r["extras"]:
+        lines.append("CERTIFICATIONS AND ACHIEVEMENTS")
+        lines += [f"• {x}" for x in r["extras"]]
+    return "\n".join(lines)

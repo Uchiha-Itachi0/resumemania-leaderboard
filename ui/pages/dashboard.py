@@ -29,11 +29,23 @@ def _tiles(dash: Dashboard) -> None:
         stat_tile("Not ranked", str(dash.submitted - len(dash.candidates)), sub="Below the bar or unreadable"),
         stat_tile(copy.TILE_ELIGIBLE, str(len(dash.candidates)), f"of {dash.submitted}",
                   bar=(len(dash.candidates) / dash.submitted) if dash.submitted else 0),
-        stat_tile(copy.TILE_PUBLIC, str(public), sub="Top 10%, rounded up"),
+        stat_tile(copy.TILE_PUBLIC, str(public),
+                  sub=copy.TILE_PUBLIC_SUB.format(label=copy.SHARE_OPTIONS[dash.campaign.public_share])),
     ]
     for col, tile in zip(st.columns(4, gap="small"), tiles, strict=True):
         with col:
             html(tile)
+
+
+def _share_control(dash: Dashboard) -> None:
+    options = list(copy.SHARE_OPTIONS)
+    current = dash.campaign.public_share
+    chosen = st.selectbox(copy.SHARE_LABEL, options, index=options.index(current), help=copy.SHARE_HELP,
+                          format_func=copy.SHARE_OPTIONS.get, key=f"share_{dash.campaign.id}")
+    if chosen != current:
+        state.service().set_public_share(dash.campaign.id, chosen)
+        state.flash(copy.SHARE_SAVED.format(label=copy.SHARE_OPTIONS[chosen].lower()))
+        st.rerun()
 
 
 def _distribution(dash: Dashboard) -> None:
@@ -120,6 +132,7 @@ def render() -> None:
             _checklist(campaign)
         return
     _tiles(dash)
+    _share_control(dash)
     html("<div style='height:16px'></div>")
     _distribution(dash)
     _ranked(dash)

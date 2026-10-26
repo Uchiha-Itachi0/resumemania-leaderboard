@@ -10,8 +10,8 @@ Rank order: score (high first), then required-skills component (high first), the
 earliest submission time. Ties that survive all three share... nothing: the earlier
 submission wins, so every rank is unique and stable.
 
-Public leaderboard: the top 10% of eligible students, rounded UP, at least 1 when anyone
-is eligible. Nobody else appears, not even as a blank row.
+Public leaderboard: the top share of eligible students (10% by default, set per campaign),
+rounded UP, at least 1 when anyone is eligible. Nobody else appears, not even as a blank row.
 """
 
 from __future__ import annotations
@@ -20,7 +20,8 @@ import math
 from dataclasses import dataclass
 from enum import Enum
 
-PUBLIC_SHARE = 0.10
+PUBLIC_SHARE = 0.10  # PRD default
+PUBLIC_SHARE_OPTIONS = (0.10, 0.25, 0.50, 1.0)
 DEFAULT_BENCHMARK = 60
 
 
@@ -58,13 +59,15 @@ def eligibility(score: int, benchmark: int, any_requirement_shown: bool) -> Stat
 
 
 def public_count(eligible: int, share: float = PUBLIC_SHARE) -> int:
-    """Top 10% rounded up, minimum 1 when anyone is eligible."""
+    """Top share rounded up, minimum 1 when anyone is eligible."""
+    if not 0 < share <= 1:
+        raise ValueError("The public share must be above 0 and at most 1.")
     if eligible <= 0:
         return 0
     return max(1, math.ceil(eligible * share - 1e-9))
 
 
-def rank(entries: list[Entry]) -> Ranking:
+def rank(entries: list[Entry], share: float = PUBLIC_SHARE) -> Ranking:
     ordered = sorted(entries, key=lambda e: (-e.score, -e.required_component, e.submitted_at, e.submission_id))
     ids = tuple(e.submission_id for e in ordered)
-    return Ranking(ordered_ids=ids, visible_ids=ids[: public_count(len(ids))])
+    return Ranking(ordered_ids=ids, visible_ids=ids[: public_count(len(ids), share)])

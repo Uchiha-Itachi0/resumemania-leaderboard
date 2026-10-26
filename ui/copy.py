@@ -14,7 +14,7 @@ HERO_BADGE = "Placement benchmarking for colleges."
 HERO_TITLE = ("<span class='g1'>Do you</span> <span class='g2'>want to know</span> "
               "who's <em>ready to place?</em>")
 HERO_SUB = "Post one job. Students send resumes. See who fits, ranked fairly and kept private."
-HERO_TICKS = ("Every score shows its evidence", "Only the top 10% go public", "Below the bar stays private")
+HERO_TICKS = ("Every score shows its evidence", "Only the top students go public", "Below the bar stays private")
 
 HERO_CTA_NOTE = "No account needed. The GitHub link in your resume is your ID."
 
@@ -23,7 +23,7 @@ HOW_TITLE = "Three steps to see who's <em>ready.</em>"
 HOW_STEPS = (
     ("Ready in 1 minute", "Post the job", "Paste one job description. It becomes the checklist every student is scored on."),
     ("Scored in 10 seconds", "Students send resumes", "Each student gets a private report with evidence and fixes."),
-    ("Updates live", "See who's ready", "You get a ranked list. Only the top 10% go public, by name."),
+    ("Updates live", "See who's ready", "You get a ranked list. Only the top slice goes public, by GitHub name."),
 )
 FAQ = (
     ("Who sees a student's score?",
@@ -65,7 +65,7 @@ WEIGHT_FIELDS = {
 WEIGHTS_OK = "Total {total} of 100"
 WEIGHTS_BAD = "Total {total} of 100. Adjust the numbers so they add up to 100."
 CAMP_PRIVACY = ("Students see their own score. You see students at or above the benchmark. "
-                "Only the top 10% appear on the public leaderboard, and only if their resume is readable.")
+                "Only the top slice you pick below appears on the public leaderboard.")
 CAMP_CREATING = "Reading the job and building the checklist"
 CAMP_CREATED = "Campaign ready. Students can now pick {title} and upload."
 NO_CAMPAIGNS = "No campaigns yet. Start one with a job description."
@@ -101,7 +101,7 @@ RESUME_PASTE = "Paste"
 RESUME_UPLOAD = "Upload"
 RESUME_PASTE_HINT = "Paste your resume text here."
 RESUME_UPLOAD_HELP = "PDF, DOCX or TXT, up to {mb} MB."
-CONSENT = "Show my resume as an example to other students if I make the top 10% (contact details removed)"
+CONSENT = "Show my resume as an example to other students if I make the public board (contact details removed)"
 RUNNING = "Scoring your resume"
 RUN_DONE = "Done. Your private report is ready."
 ERR_NEED_RESUME = "Add your resume first: upload a file or paste the text."
@@ -113,7 +113,7 @@ STATUS_HEAD = {
     "failed": "The AI was <em>busy.</em> Try again.",
 }
 PUBLIC_YES = "You're on the public leaderboard."
-PUBLIC_NO = "You're ranked privately. Only the top 10% show publicly."
+PUBLIC_NO = "You're ranked privately. Only the top {share} show publicly."
 REUPLOAD_NOTE = "Improve your resume and upload it again. Same GitHub link, so your old entry is replaced."
 BREAKDOWN_TITLE = "How your score adds up"
 REQS_TITLE = "Requirement by requirement"
@@ -123,8 +123,15 @@ REWRITES_NOTE = "Built only from your facts. Fill in every [N] and [CONFIRM] you
 
 # ---------- leaderboard ----------
 BOARD_EYEBROW = "Leaderboard · {title}"
-BOARD_TITLE = "The top <em>10%.</em>"
-BOARD_SUB = "{eligible} reached the {benchmark}% bar. Showing the top 10%: {shown}."
+BOARD_TITLE = "The top <em>{share}.</em>"
+BOARD_TITLE_ALL = "Everyone who made <em>the bar.</em>"
+BOARD_SUB = "{eligible} of {submitted} reached the {benchmark}% bar. Showing the top {share}: {shown}."
+SHARE_LABEL = "Public leaderboard shows"
+SHARE_HELP = "The PRD default is the top 10%. Everyone else at the benchmark is ranked privately."
+SHARE_OPTIONS = {0.10: "Top 10% (default)", 0.25: "Top 25%", 0.50: "Top 50%", 1.0: "Everyone at the benchmark"}
+SHARE_SHORT = {0.10: "10%", 0.25: "25%", 0.50: "50%", 1.0: "100%"}
+SHARE_SAVED = "Saved. The public board now shows {label}."
+TILE_PUBLIC_SUB = "{label}, rounded up"
 BOARD_EMPTY = "Nobody is on the board yet. Check back after more resumes come in."
 SEE_RESUME = "See their resume (contact details removed)"
 
