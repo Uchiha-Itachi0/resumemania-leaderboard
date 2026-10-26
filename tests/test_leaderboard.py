@@ -65,8 +65,10 @@ def test_weighted_score_respects_custom_weights():
 def test_scoring_config_rejects_bad_weights():
     with pytest.raises(ValueError):
         ScoringConfig(weights={"luck": 10})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="add up to 100"):
         ScoringConfig(weights={"required": 0})
+    with pytest.raises(ValueError, match="add up to 100"):
+        ScoringConfig(weights={"required": 40, "evidence": 25})
 
 
 # ---------- eligibility and ranking ----------

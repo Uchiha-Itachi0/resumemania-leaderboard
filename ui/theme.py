@@ -137,6 +137,9 @@ div[data-testid="stVerticalBlockBorderWrapper"]{background:var(--page);border-co
 .rm-check:first-child{border-top:none}
 .rm-check .d{color:var(--meta);font-size:14px}
 .rm-muted{color:var(--meta);font-size:14px}
+[data-testid="stSliderThumbValue"],[data-testid="stSliderTickBarMin"],[data-testid="stSliderTickBarMax"]{color:var(--ink)!important;font-weight:600}
+.rm-total{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:999px;font-size:13.5px;font-weight:700}
+.rm-total.ok{background:var(--ok-bg);color:var(--ok)}.rm-total.bad{background:#FBE9E5;color:var(--signal)}
 [data-testid="stHeaderActionElements"]{display:none}
 </style>
 """.replace("__FONTS__", FONTS_URL)

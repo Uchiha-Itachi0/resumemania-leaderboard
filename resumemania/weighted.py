@@ -33,6 +33,7 @@ COMPONENT_LABELS = {
     "education": "Education and certifications",
 }
 DEFAULT_WEIGHTS = {"required": 40, "evidence": 25, "experience": 15, "preferred": 10, "education": 10}
+WEIGHT_TOTAL = 100
 
 
 @dataclass(frozen=True)
@@ -45,8 +46,8 @@ class ScoringConfig:
             raise ValueError(f"Unknown score components: {', '.join(sorted(unknown))}")
         if any(w < 0 for w in self.weights.values()):
             raise ValueError("Weights can't be negative.")
-        if sum(self.weights.values()) <= 0:
-            raise ValueError("At least one weight must be above 0.")
+        if sum(self.weights.values()) != WEIGHT_TOTAL:
+            raise ValueError(f"The weights must add up to {WEIGHT_TOTAL}.")
 
 
 @dataclass(frozen=True)

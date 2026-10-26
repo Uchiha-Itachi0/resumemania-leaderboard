@@ -123,3 +123,12 @@ def test_pages_without_campaigns_point_the_way():
     assert copy.NO_CAMPAIGN_YET in [i.value for i in at.info]
     at.switch_page("ui/pages/leaderboard.py").run()
     assert not at.exception
+
+
+def test_weights_must_total_100_before_creating():
+    at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
+    at.switch_page("ui/pages/campaigns.py").run()
+    assert not _button(at, copy.CTA_COORD).disabled
+    at.number_input(key="w_required").set_value(35).run()
+    assert _button(at, copy.CTA_COORD).disabled
+    assert "Total 95 of 100" in _md(at)

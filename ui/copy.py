@@ -50,8 +50,20 @@ CAMP_COHORT = "Cohort (optional)"
 CAMP_COHORT_HINT = "e.g. CSE batch 2026, Pune campus"
 CAMP_JD = "Job description"
 CAMP_JD_HINT = "Paste the full job post: duties, must-haves and nice-to-haves."
-CAMP_BENCHMARK = "Benchmark: students at or above this score are ranked"
-CAMP_WEIGHTS = "Scoring weights (check them with your placement team)"
+CAMP_BENCHMARK = "Benchmark"
+CAMP_BENCHMARK_HELP = "Students at or above this score are ranked. Everyone below sees their score privately."
+WEIGHTS_TITLE = "How the score adds up"
+WEIGHTS_SUB = ("Each part earns up to its points. Shown in the resume earns all of them, partly shown earns half. "
+               "The five must add up to 100. Check them with your placement team.")
+WEIGHT_FIELDS = {
+    "required": ("Required skills", "Must-have skills from the job that the resume shows."),
+    "evidence": ("Applied evidence", "Skills proved in an internship or project, not only listed under Skills."),
+    "experience": ("Experience", "Asks like '1+ years' or 'internship in fintech'."),
+    "preferred": ("Preferred skills", "Nice-to-have skills from the job."),
+    "education": ("Education", "Degree and certification asks."),
+}
+WEIGHTS_OK = "Total {total} of 100"
+WEIGHTS_BAD = "Total {total} of 100. Adjust the numbers so they add up to 100."
 CAMP_PRIVACY = ("Students see their own score. You see students at or above the benchmark. "
                 "Only the top 10% appear on the public leaderboard, and only if their resume is readable.")
 CAMP_CREATING = "Reading the job and building the checklist"

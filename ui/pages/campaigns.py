@@ -1,4 +1,4 @@
-"""Coordinator: create campaigns and see the ones you run."""
+"""Coordinator: create campaigns and see the ones that exist."""
 
 from __future__ import annotations
 
@@ -7,10 +7,26 @@ import streamlit as st
 from resumemania.ingest import IngestError
 from resumemania.llm import LLMError
 from resumemania.ranking import DEFAULT_BENCHMARK
-from resumemania.weighted import COMPONENT_LABELS, DEFAULT_WEIGHTS
+from resumemania.weighted import DEFAULT_WEIGHTS, WEIGHT_TOTAL
 from ui import copy, state
 from ui.components import esc, html, page_title, pill
 from ui.report_view import setup_card
+
+
+def _weights() -> dict[str, int]:
+    """Five weight boxes with short labels, help text and a live total."""
+    html(f"<div class='rm-label' style='margin-top:10px'>{copy.WEIGHTS_TITLE}</div>"
+         f"<p class='rm-muted' style='margin:4px 0 10px'>{copy.WEIGHTS_SUB}</p>")
+    cols = st.columns(len(DEFAULT_WEIGHTS), gap="small")
+    weights = {}
+    for col, (key, default) in zip(cols, DEFAULT_WEIGHTS.items(), strict=True):
+        label, help_text = copy.WEIGHT_FIELDS[key]
+        weights[key] = int(col.number_input(label, 0, 100, default, step=5, key=f"w_{key}", help=help_text))
+    total = sum(weights.values())
+    ok = total == WEIGHT_TOTAL
+    text = (copy.WEIGHTS_OK if ok else copy.WEIGHTS_BAD).format(total=total)
+    html(f"<span class='rm-total {'ok' if ok else 'bad'}'>{esc(text)}</span>")
+    return weights
 
 
 def _create_form() -> None:
@@ -18,21 +34,16 @@ def _create_form() -> None:
         if not state.settings().has_api_key:
             setup_card()
             return
-        with st.form("new_campaign"):
-            left, right = st.columns(2)
-            title = left.text_input(copy.CAMP_TITLE, placeholder=copy.CAMP_TITLE_HINT)
-            cohort = right.text_input(copy.CAMP_COHORT, placeholder=copy.CAMP_COHORT_HINT)
-            jd = st.text_area(copy.CAMP_JD, placeholder=copy.CAMP_JD_HINT, height=240)
-            benchmark = st.slider(copy.CAMP_BENCHMARK, 0, 100, DEFAULT_BENCHMARK, step=5, format="%d%%")
-            st.caption(copy.CAMP_WEIGHTS)
-            cols = st.columns(len(DEFAULT_WEIGHTS))
-            weights = {
-                key: col.number_input(COMPONENT_LABELS[key], 0, 100, default, step=5, key=f"w_{key}")
-                for col, (key, default) in zip(cols, DEFAULT_WEIGHTS.items(), strict=True)
-            }
-            st.caption(copy.CAMP_PRIVACY)
-            submitted = st.form_submit_button(copy.CTA_COORD, type="primary", use_container_width=True)
-        if submitted:
+        left, right = st.columns(2)
+        title = left.text_input(copy.CAMP_TITLE, placeholder=copy.CAMP_TITLE_HINT, key="camp_title")
+        cohort = right.text_input(copy.CAMP_COHORT, placeholder=copy.CAMP_COHORT_HINT, key="camp_cohort")
+        jd = st.text_area(copy.CAMP_JD, placeholder=copy.CAMP_JD_HINT, height=220, key="camp_jd")
+        benchmark = st.slider(copy.CAMP_BENCHMARK, 0, 100, DEFAULT_BENCHMARK, step=5, format="%d%%",
+                              help=copy.CAMP_BENCHMARK_HELP, key="camp_benchmark")
+        weights = _weights()
+        st.caption(copy.CAMP_PRIVACY)
+        ready = sum(weights.values()) == WEIGHT_TOTAL
+        if st.button(copy.CTA_COORD, type="primary", use_container_width=True, disabled=not ready):
             _create(title, jd, cohort, benchmark, weights)
 
 
@@ -49,22 +60,27 @@ def _create(title: str, jd: str, cohort: str, benchmark: int, weights: dict[str,
 
 
 def _campaign_card(campaign) -> None:
-    svc = state.service()
-    dash = svc.dashboard(campaign.id)
+    dash = state.service().dashboard(campaign.id)
     with st.container(border=True):
         left, right = st.columns([3, 1], vertical_alignment="center")
         cohort = f" · {esc(campaign.cohort)}" if campaign.cohort else ""
-        left.markdown(
-            f"<h3 style='margin:0;font-size:22px'>{esc(campaign.title)}</h3>"
-            f"<div class='rm-muted' style='margin-top:6px'>Benchmark {campaign.benchmark}%{cohort}</div>"
-            f"<div style='display:flex;gap:6px;margin-top:10px;flex-wrap:wrap'>"
-            f"{pill(f'{dash.submitted} resumes', 'mono')}"
-            f"{pill(f'{len(dash.candidates)} at benchmark', 'good')}</div>",
-            unsafe_allow_html=True,
-        )
+        with left:
+            html(
+                f"<div style='display:flex;flex-direction:column;gap:6px;padding:2px 0 6px'>"
+                f"<span style='font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.03em'>"
+                f"{esc(campaign.title)}</span>"
+                f"<span class='rm-muted'>Benchmark {campaign.benchmark}%{cohort}</span>"
+                f"<span style='display:flex;gap:6px;flex-wrap:wrap;margin-top:4px'>"
+                f"{pill(_plural(dash.submitted, 'resume'), 'mono')}{pill(f'{len(dash.candidates)} at benchmark', 'good')}"
+                f"</span></div>"
+            )
         if right.button(copy.OPEN_DASHBOARD, key=f"open_{campaign.id}", use_container_width=True):
             st.session_state[state.CAMPAIGN_ID] = campaign.id
             st.switch_page("ui/pages/dashboard.py")
+
+
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}" if n == 1 else f"{n} {word}s"
 
 
 def render() -> None:
