@@ -1,4 +1,4 @@
-"""Student: pick a campaign, give a GitHub username and a resume, see a private result."""
+"""Student: pick a campaign, upload a resume with a GitHub link, see a private result."""
 
 from __future__ import annotations
 
@@ -18,7 +18,6 @@ def _form(campaign) -> None:
         return
     max_mb = state.settings().max_upload_mb
     with st.container(border=True):
-        username = st.text_input(copy.GITHUB, placeholder=copy.GITHUB_HINT, key="github")
         paste_tab, upload_tab = st.tabs([copy.RESUME_PASTE, copy.RESUME_UPLOAD])
         with paste_tab:
             pasted = st.text_area(copy.RESUME_PASTE_HINT, height=200, label_visibility="collapsed",
@@ -26,13 +25,14 @@ def _form(campaign) -> None:
         with upload_tab:
             upload = st.file_uploader(copy.RESUME_UPLOAD, type=["pdf", "docx", "txt"], label_visibility="collapsed")
             st.caption(copy.RESUME_UPLOAD_HELP.format(mb=max_mb))
+        st.caption(copy.RESUME_GITHUB_NOTE)
         consent = st.checkbox(copy.CONSENT, key="consent")
         go = st.button(copy.CTA_STUDENT, type="primary", use_container_width=True)
     if go:
-        _run(campaign, username, pasted, upload, consent, max_mb)
+        _run(campaign, pasted, upload, consent, max_mb)
 
 
-def _run(campaign, username: str, pasted: str, upload, consent: bool, max_mb: int) -> None:
+def _run(campaign, pasted: str, upload, consent: bool, max_mb: int) -> None:
     try:
         if upload is not None:
             resume = extract_text(upload.name, upload.getvalue(), max_mb)
@@ -41,18 +41,13 @@ def _run(campaign, username: str, pasted: str, upload, consent: bool, max_mb: in
         else:
             st.error(copy.ERR_NEED_RESUME)
             return
-        handle = username.strip() or github.from_resume(resume.text)
-        if not handle:
-            st.error(copy.GITHUB_MISSING)
-            return
         with st.spinner(copy.RUNNING):
-            result = state.service().submit(campaign.id, handle, resume, consent)
+            result = state.service().submit(campaign.id, resume, consent)
     except (IngestError, github.InvalidUsername) as exc:
         st.error(str(exc))
         return
     st.session_state[state.RESULT] = result
-    note = copy.GITHUB_FROM_RESUME.format(username=result.submission.github_username) if not username.strip() else ""
-    state.flash(f"{copy.RUN_DONE} {note}".strip())
+    state.flash(copy.GITHUB_FROM_RESUME.format(username=result.submission.github_username))
     st.rerun()
 
 

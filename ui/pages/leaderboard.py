@@ -6,7 +6,7 @@ import streamlit as st
 
 from resumemania import github
 from ui import copy, state
-from ui.components import esc, html, page_title
+from ui.components import avatar, esc, html, page_title
 from ui.picker import pick_campaign
 
 
@@ -28,8 +28,7 @@ def render() -> None:
             html(
                 f"<div style='display:flex;align-items:center;gap:16px'>"
                 f"<span class='rm-num' style='width:40px;height:40px;font-size:16px'>{row.rank}</span>"
-                f"<img src='{esc(github.avatar_url(row.github_username))}' alt='' width='44' height='44' "
-                f"style='border-radius:999px;border:1px solid var(--line)'>"
+                f"{avatar(row.github_username, github.avatar_url(row.github_username))}"
                 f"<a href='https://github.com/{esc(row.github_username)}' target='_blank' rel='noopener' "
                 f"style='font-size:20px;font-weight:700;flex:1;color:var(--ink);text-decoration:none'>"
                 f"@{esc(row.github_username)}</a>"

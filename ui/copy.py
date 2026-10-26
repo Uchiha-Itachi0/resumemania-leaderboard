@@ -16,7 +16,7 @@ HERO_TITLE = ("<span class='g1'>Do you</span> <span class='g2'>want to know</spa
 HERO_SUB = "Post one job. Students send resumes. See who fits, ranked fairly and kept private."
 HERO_TICKS = ("Every score shows its evidence", "Only the top 10% go public", "Below the bar stays private")
 
-HERO_CTA_NOTE = "No account needed. Your GitHub username is your ID."
+HERO_CTA_NOTE = "No account needed. The GitHub link in your resume is your ID."
 
 HOW_EYEBROW = "How it works"
 HOW_TITLE = "Three steps to see who's <em>ready.</em>"
@@ -30,7 +30,8 @@ FAQ = (
      "The student, right after uploading. Staff see students at or above the benchmark. "
      "Nobody else's score is ever shown."),
     ("Why a GitHub username?",
-     "It's unique, so there's no account to make. Upload again with the same username to replace your entry."),
+     "It's unique, so there's no account to make. We read it from the github.com link in your resume. "
+     "Upload again with the same link to replace your entry."),
     ("Is the score a hiring decision?",
      "No. It's an estimate of how well a resume shows this job's requirements. Use it to guide, not to reject."),
     ("Does the AI decide the rank?",
@@ -76,11 +77,10 @@ EXPORT = "Download ranked list (.csv)"
 
 # ---------- student ----------
 STUDENT_TITLE = "Where do you <em>stand?</em>"
-STUDENT_SUB = "Pick the job, add your GitHub username and your resume. Results in about 10 seconds."
-GITHUB = "GitHub username"
-GITHUB_HINT = "e.g. octocat. We'll use the one in your resume if you leave this empty."
-GITHUB_MISSING = "Add your GitHub username. It's how you appear on the leaderboard."
-GITHUB_FROM_RESUME = "Using {username} from your resume."
+STUDENT_SUB = ("Pick the job and add your resume. The GitHub link in your resume is your ID. "
+               "Results in about 10 seconds.")
+GITHUB_FROM_RESUME = "Done. You're @{username}, from the GitHub link in your resume."
+RESUME_GITHUB_NOTE = "Your resume needs a GitHub profile link, like github.com/your-username."
 NO_CAMPAIGN_YET = "No campaigns yet. Ask your coordinator to start one."
 PICK_CAMPAIGN = "Campaign"
 RESUME_PASTE = "Paste"
@@ -100,7 +100,7 @@ STATUS_HEAD = {
 }
 PUBLIC_YES = "You're on the public leaderboard."
 PUBLIC_NO = "You're ranked privately. Only the top 10% show publicly."
-REUPLOAD_NOTE = "Improve your resume and upload again with the same GitHub username. Your old entry is replaced."
+REUPLOAD_NOTE = "Improve your resume and upload it again. Same GitHub link, so your old entry is replaced."
 BREAKDOWN_TITLE = "How your score adds up"
 REQS_TITLE = "Requirement by requirement"
 PLAN_TITLE = "Do these first"

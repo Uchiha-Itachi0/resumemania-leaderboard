@@ -1,0 +1,24 @@
+Cybersecurity Analyst Intern (6 months) - Thiruvananthapuram
+
+About the role
+Join our Security Operations Centre. You'll monitor alerts, investigate incidents and help harden client systems.
+
+What you'll do
+- Monitor and triage SIEM alerts
+- Investigate suspicious network and endpoint activity
+- Run vulnerability scans and track fixes
+- Write clear incident and pentest reports
+
+Must have
+- Networking fundamentals (TCP/IP, DNS, HTTP)
+- Linux command line
+- Hands-on with security tools such as Wireshark, Nmap or Burp Suite
+- Knowledge of the OWASP Top 10
+- Clear written reports
+
+Nice to have
+- SIEM experience (Splunk or Elastic)
+- Python or Bash scripting
+- CTF participation
+- Security+ or CEH certification
+- Vulnerability scanning with Nessus or OpenVAS

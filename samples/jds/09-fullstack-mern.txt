@@ -1,0 +1,24 @@
+Full-Stack Developer, MERN (0-1 years) - Kochi
+
+About the role
+Build web products for our clients from database to UI.
+
+What you'll do
+- Build REST APIs with Node.js and Express
+- Build React front ends
+- Design MongoDB schemas
+- Deploy and maintain apps in the cloud
+
+Must have
+- JavaScript (ES6+)
+- React
+- Node.js and Express
+- MongoDB
+- Git
+
+Nice to have
+- TypeScript
+- Real-time features with Socket.io or WebSockets
+- Testing with Jest
+- Docker and a cloud platform (AWS, Vercel or Render)
+- Projects with measurable users or results

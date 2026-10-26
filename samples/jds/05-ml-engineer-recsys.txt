@@ -1,0 +1,25 @@
+Machine Learning Engineer, Recommendations (1-3 years) - Hyderabad
+
+About the role
+Our Recommendations team trains and serves the models behind the home feed for 20M users. You'll own models from training data to online A/B tests.
+
+What you'll do
+- Train and tune ranking and recommendation models in PyTorch
+- Build feature pipelines in Spark and SQL over billions of events
+- Run offline evaluation (NDCG, recall@k) and online A/B tests
+- Deploy models with Kubernetes and monitor drift in production
+- Work with product managers to turn metrics into roadmap decisions
+
+Must have
+- 1+ years training deep learning models with PyTorch or TensorFlow
+- Strong statistics: hypothesis testing, A/B test design
+- Spark or another distributed data processing framework
+- Strong SQL and Python
+- Degree in Computer Science, Statistics or Mathematics
+
+Nice to have
+- Experience with recommender systems or learning-to-rank
+- MLflow or Kubeflow for experiment tracking
+- Kubernetes and Docker
+- Published papers or Kaggle competition results
+- Feature stores such as Feast

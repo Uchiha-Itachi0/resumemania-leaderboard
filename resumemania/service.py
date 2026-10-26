@@ -1,4 +1,4 @@
-"""Everything the UI may do. No accounts: a student is their GitHub username.
+"""Everything the UI may do. No accounts: a student is the GitHub username linked in their resume.
 
 Privacy rules enforced here, not in the UI:
 - The leaderboard returns only the top 10% of eligible students, nothing about anyone else.
@@ -104,10 +104,11 @@ class CampaignService:
 
     # ---------- students ----------
 
-    def submit(self, campaign_id: int, github_username: str, resume: ExtractedText, consent: bool) -> StudentResult:
-        """Score a resume. A second upload from the same GitHub user replaces the first."""
+    def submit(self, campaign_id: int, resume: ExtractedText, consent: bool) -> StudentResult:
+        """Score a resume. The GitHub link in it is the student's ID, and a second upload
+        with the same GitHub username replaces the first."""
         campaign = self.campaign(campaign_id)
-        username = github.normalise(github_username)
+        username = github.require_from_resume(resume.text)
         submission = self._store.replace_submission(campaign_id, username, github.key(username), resume.text,
                                                     resume.source, resume.page_count, consent)
         evaluation = self._evaluate(campaign, submission, resume)

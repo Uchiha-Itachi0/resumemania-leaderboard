@@ -34,7 +34,7 @@ def resume_text() -> str:
 
 @pytest.fixture
 def jd_text() -> str:
-    return (SAMPLES / "jd_data_analyst_intern.txt").read_text()
+    return (SAMPLES / "jds" / "01-data-analyst-intern.txt").read_text()
 
 
 @pytest.fixture

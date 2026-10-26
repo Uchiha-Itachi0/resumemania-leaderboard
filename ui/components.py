@@ -86,3 +86,15 @@ def pill(text: str, kind: str = "") -> str:
 
 def chips(items: list[str], kind: str = "mono") -> str:
     return "<div class='rm-chips'>" + "".join(pill(i, kind) for i in items) + "</div>"
+
+
+def avatar(username: str, url: str, size: int = 44) -> str:
+    """GitHub avatar over an initials disc. If the image can't load, the initials show through."""
+    initials = esc(username[:2].upper())
+    return (
+        f"<span aria-hidden='true' style='position:relative;display:inline-flex;flex:none;width:{size}px;"
+        f"height:{size}px;border-radius:999px;background:var(--sand-2);color:var(--ink);font-weight:700;"
+        f"font-size:{size // 3}px;align-items:center;justify-content:center;overflow:hidden;"
+        f"border:1px solid var(--line)'>{initials}<span style='position:absolute;inset:0;"
+        f"background:url(\"{esc(url)}\") center/cover no-repeat'></span></span>"
+    )

@@ -169,7 +169,7 @@ def campaign_setup(storage, jd_text):
 
 def _submit(svc, switch, job, handle, campaign, statuses, resume_text, consent=False):
     switch.current = _llm_for(job, statuses)
-    return svc.submit(campaign.id, handle, from_paste(resume_text), consent)
+    return svc.submit(campaign.id, from_paste(f"{resume_text}\ngithub.com/{handle}"), consent)
 
 
 M, P, X = MatchStatus.MATCHED, MatchStatus.PARTIAL, MatchStatus.MISSING
@@ -203,7 +203,7 @@ def test_reupload_replaces_the_old_entry(campaign_setup, resume_text):
     svc, switch, job, campaign = campaign_setup
     _submit(svc, switch, job, "asha", campaign, {"R1": M, "R2": M, "R3": P}, resume_text)
     _submit(svc, switch, job, "Ben", campaign, {"R1": M, "R2": P, "R3": X}, resume_text)
-    improved = _submit(svc, switch, job, "github.com/ben", campaign, {"R1": M, "R2": M, "R3": M}, resume_text)
+    improved = _submit(svc, switch, job, "ben", campaign, {"R1": M, "R2": M, "R3": M}, resume_text)
     assert improved.rank == 1
     assert svc.dashboard(campaign.id).submitted == 2  # Ben counted once, case-insensitive
     assert [c.github_username for c in svc.dashboard(campaign.id).candidates] == ["ben", "asha"]
@@ -220,7 +220,7 @@ def test_irrelevant_invalid_and_failed_are_not_ranked(campaign_setup, resume_tex
     irrelevant = _submit(svc, switch, job, "asha", campaign, {"R1": X, "R2": X, "R3": X}, resume_text)
     invalid = _submit(svc, switch, job, "ben", campaign, {}, "too short")
     switch.current = FakeLLM({ParsedResume: LLMError("Gemini is busy")})
-    failed = svc.submit(campaign.id, "cara", from_paste(resume_text), False)
+    failed = svc.submit(campaign.id, from_paste(resume_text + "\ngithub.com/cara"), False)
 
     assert irrelevant.evaluation.status == "irrelevant"
     assert invalid.evaluation.status == "invalid" and "resume" in invalid.evaluation.message
@@ -229,11 +229,19 @@ def test_irrelevant_invalid_and_failed_are_not_ranked(campaign_setup, resume_tex
     assert {name for name, _ in svc.dashboard(campaign.id).problems} == {"ben", "cara"}
 
 
-def test_bad_github_username_is_rejected_before_scoring(campaign_setup, resume_text):
+def test_resume_without_github_link_is_rejected_before_scoring(campaign_setup, resume_text):
     svc, switch, job, campaign = campaign_setup
-    with pytest.raises(github.InvalidUsername):
-        _submit(svc, switch, job, "not a username", campaign, {"R1": M}, resume_text)
+    switch.current = _llm_for(job, {"R1": M})
+    with pytest.raises(github.InvalidUsername, match="GitHub profile link"):
+        svc.submit(campaign.id, from_paste(resume_text), False)
     assert switch.current.calls == []
+    assert svc.dashboard(campaign.id).submitted == 0
+
+
+def test_github_require_from_resume():
+    assert github.require_from_resume("x github.com/Asha-K y") == "Asha-K"
+    with pytest.raises(github.InvalidUsername):
+        github.require_from_resume("no link")
 
 
 def test_staff_cannot_open_below_benchmark_reports(campaign_setup, resume_text):

@@ -1,0 +1,23 @@
+Product Analyst (Fresher) - Bengaluru
+
+About the role
+Help our product managers decide what to build next. You'll own metrics, run experiments and tell the story behind the numbers.
+
+What you'll do
+- Define and track product metrics such as activation, retention and conversion
+- Analyse funnels and cohorts in SQL and our product analytics tools
+- Design and read A/B tests
+- Write clear recommendations for product managers and leadership
+
+Must have
+- Strong SQL
+- Experience with product analytics tools such as Mixpanel or Amplitude
+- A/B testing and basic statistics
+- Excel or Google Sheets
+- Clear written and spoken communication
+
+Nice to have
+- Python or R for analysis
+- Dashboards in Looker, Tableau or Power BI
+- Case competition or consulting experience
+- Degree in Economics, Statistics, Engineering or a related field

@@ -14,6 +14,10 @@ class InvalidUsername(ValueError):
     """The message is safe to show."""
 
 
+NO_LINK = ("Add your GitHub profile link to your resume, like github.com/your-username. "
+           "It's how you appear on the leaderboard.")
+
+
 def normalise(raw: str) -> str:
     """Return the username as typed (minus @ or URL), or raise InvalidUsername."""
     value = raw.strip()
@@ -37,6 +41,14 @@ def from_resume(text: str) -> str | None:
         if match.group(1).lower() not in RESERVED:
             return match.group(1)
     return None
+
+
+def require_from_resume(text: str) -> str:
+    """The student's identity. Raises InvalidUsername when the resume has no GitHub link."""
+    found = from_resume(text)
+    if not found:
+        raise InvalidUsername(NO_LINK)
+    return normalise(found)
 
 
 def avatar_url(username: str, size: int = 80) -> str:

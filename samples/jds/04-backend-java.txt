@@ -1,0 +1,24 @@
+Backend Engineer, Java and Spring Boot (0-2 years) - Hyderabad
+
+About the role
+We run the payments and invoicing platform for 8,000 small businesses. You'll build and run the APIs behind it.
+
+What you'll do
+- Design and build REST APIs with Java and Spring Boot
+- Model data in PostgreSQL or MySQL and write efficient queries
+- Add caching, queues and monitoring to keep services fast
+- Write unit and integration tests
+
+Must have
+- Strong Java (Java 11 or later)
+- Spring Boot and Spring Data JPA or Hibernate
+- SQL with PostgreSQL or MySQL
+- REST API design
+- Git and unit testing with JUnit
+
+Nice to have
+- Kafka or RabbitMQ
+- Redis
+- Docker and Kubernetes
+- Microservices experience
+- Degree in Computer Science or a related field

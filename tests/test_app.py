@@ -82,8 +82,7 @@ def test_full_flow_campaign_to_leaderboard(jd_text, resume_text):
     assert any("Campaign ready" in s.value for s in at.success)
 
     at.switch_page("ui/pages/submit.py").run()
-    at.text_input(key="github").set_value("priya-s")
-    at.text_area(key="resume_paste").set_value(resume_text)
+    at.text_area(key="resume_paste").set_value(resume_text + "\ngithub.com/priya-s")
     at.checkbox(key="consent").check()
     _button(at, copy.CTA_STUDENT).click().run()
     assert not at.exception, at.exception
@@ -108,13 +107,14 @@ def test_github_username_taken_from_resume(jd_text, resume_text):
     assert any("priya-from-resume" in s.value for s in at.success)
 
 
-def test_missing_github_username_is_explained(jd_text, resume_text):
+def test_resume_without_github_link_is_explained(jd_text, resume_text):
     at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
     _create_campaign(at, jd_text)
     at.switch_page("ui/pages/submit.py").run()
     at.text_area(key="resume_paste").set_value(resume_text)
     _button(at, copy.CTA_STUDENT).click().run()
-    assert copy.GITHUB_MISSING in [e.value for e in at.error]
+    assert any("GitHub profile link" in e.value for e in at.error)
+    assert all(t.key != "github" for t in at.text_input)
 
 
 def test_pages_without_campaigns_point_the_way():

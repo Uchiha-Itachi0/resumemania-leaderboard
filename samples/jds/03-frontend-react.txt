@@ -1,0 +1,24 @@
+Frontend Developer, React (Fresher) - Gurugram / Hybrid
+
+About the role
+Our consumer app serves 2M monthly users. You'll build the screens they touch every day and keep them fast.
+
+What you'll do
+- Build features in React and TypeScript with our design system
+- Improve Core Web Vitals and page load time
+- Write unit and end-to-end tests
+- Work with designers in Figma and backend engineers on REST APIs
+
+Must have
+- Strong JavaScript and TypeScript
+- React (hooks, state management such as Redux or Zustand)
+- HTML, CSS and responsive layouts
+- Testing with Jest, React Testing Library or Playwright
+- Git
+
+Nice to have
+- Next.js and server-side rendering
+- Web performance work (Lighthouse, Core Web Vitals)
+- Accessibility (WCAG)
+- Tailwind CSS
+- Open source contributions

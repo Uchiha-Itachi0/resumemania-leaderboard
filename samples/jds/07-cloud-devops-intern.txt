@@ -1,0 +1,24 @@
+Cloud and DevOps Intern (6 months) - Pune / Remote
+
+About the role
+Join our platform team to automate infrastructure, speed up deployments and keep production healthy.
+
+What you'll do
+- Write infrastructure as code with Terraform on AWS
+- Build and improve CI/CD pipelines
+- Run workloads on Kubernetes
+- Set up monitoring and alerting
+
+Must have
+- Linux and shell scripting (Bash)
+- Hands-on AWS (EC2, S3, IAM, VPC)
+- Docker
+- A CI/CD tool such as GitHub Actions or Jenkins
+- Git
+
+Nice to have
+- Terraform
+- Kubernetes and Helm
+- Prometheus and Grafana
+- An AWS or Kubernetes certification
+- Python scripting

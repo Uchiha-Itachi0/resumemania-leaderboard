@@ -1,0 +1,24 @@
+Android Developer, Kotlin (Fresher) - Kolkata / Hybrid
+
+About the role
+Build the Android app that 1M riders use to book and track trips.
+
+What you'll do
+- Build features in Kotlin with Jetpack Compose
+- Keep the app fast, stable and usable offline
+- Integrate REST APIs and push notifications
+- Publish releases through the Play Console
+
+Must have
+- Kotlin
+- Jetpack Compose or Android Views with MVVM
+- Coroutines and Flow
+- REST API integration with Retrofit
+- Git
+
+Nice to have
+- Room for offline storage
+- Hilt or Dagger
+- Firebase (Auth, Cloud Messaging, Crashlytics)
+- An app published on the Play Store
+- Google Maps SDK

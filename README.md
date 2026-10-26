@@ -8,7 +8,7 @@ Post one job. Students send resumes. See who fits, ranked fairly and kept privat
 - Only the top 10% go public, and only by GitHub username
 - Below the bar stays private: a student's score is shown to that student and nobody else
 
-No accounts. A student's GitHub username is their ID. Uploading again with the same username replaces their old entry.
+No accounts. A student's ID is the `github.com/username` link in their resume. Uploading again with the same link replaces their old entry. A resume without a GitHub link is turned away with a clear message.
 
 This is the cohort version of [ResumeMania Personal](https://github.com/Uchiha-Itachi0/resumemania-personal). It uses the same agents, validation gate and design, and adds campaigns, weighted scoring, eligibility and a leaderboard.
 
@@ -32,8 +32,24 @@ streamlit run app.py
 ```
 
 1. **Coordinator:** open **Campaigns**, paste a job description and press **Start my campaign**. The job is read once, and that one checklist is used for every student.
-2. **Students:** open **Check my rank**, pick the campaign, add a GitHub username (or leave it empty if the resume has a `github.com/...` link), upload a resume and press **Check my rank**.
+2. **Students:** open **Check my rank**, pick the campaign, upload a resume that includes a `github.com/your-username` link and press **Check my rank**.
 3. **Everyone:** **Leaderboard** shows the top 10%. **Dashboard** shows the coordinator the full ranked list, the score spread and any resumes that couldn't be read.
+
+## Try it with sample data
+
+Ten sample job descriptions and ten fictional student resumes come with the repo. Every name, email, phone number and GitHub username in them is made up.
+
+```bash
+python scripts/seed_campaigns.py
+```
+
+That creates ten campaigns (Data Analyst, AI Engineer, Frontend, Java Backend, ML, Product Analyst, DevOps, Android, MERN and Cybersecurity) from `samples/jds/`. It takes a few seconds and is safe to run twice.
+
+The resumes are in `samples/resumes/` (eight PDFs, two DOCX). Each student fits one or two jobs well, and one is deliberately weak, so you see every status. To regenerate them somewhere else:
+
+```bash
+python scripts/make_sample_resumes.py ~/Downloads/resumemania-sample-resumes
+```
 
 ## How a resume is scored
 
@@ -74,9 +90,11 @@ resumemania/               Engine (shared with ResumeMania Personal, plus the fi
   ranking.py               Eligibility, top 10% rounding, tie-breaks
   service.py               Campaigns, uploads, leaderboard and dashboard, with the privacy rules
   storage.py               SQLite: campaigns, submissions, evaluations, leaderboard snapshots
-  github.py                GitHub username checks and resume link detection
+  github.py                Reads the student's GitHub username from their resume
   redact.py                Removes contact details before a resume is shared
 ui/                        Streamlit pages, theme (matched to vibemyad.com) and all copy (ui/copy.py)
+scripts/                   Seed the sample campaigns and generate the sample resumes
+samples/                   Ten job descriptions and ten fictional resumes
 tests/                     Unit, integration and end-to-end UI tests (no API key needed)
 ```
 
@@ -105,6 +123,6 @@ ruff check .
 This build is made for workshops and demos on one machine. Before you use it with a real cohort:
 
 - **Access:** there are no accounts, so anyone who can open the app can open the Dashboard and create campaigns. Run it on a machine only staff can reach, or put it behind your college's sign-in (for example Supabase Auth).
-- **Identity:** anyone can type any GitHub username. If that matters, verify ownership (for example, ask students to add a code to their GitHub bio).
+- **Identity:** anyone can put any GitHub link in a resume. If that matters, verify ownership (for example, ask students to add a code to their GitHub bio).
 - **Consent:** tell students what is stored, who sees it and how long you keep it. Delete `data/` when the drive ends.
 - **Use:** scores estimate how well a resume shows a job's requirements. They are not hiring decisions and must never use protected characteristics.

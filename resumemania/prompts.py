@@ -26,8 +26,12 @@ Task: turn the job description into a requirement checklist.
 - priority = "must" if the JD says required/must/minimum or lists it as core;
   otherwise "nice".
 - ids are R1, R2, R3 ... in order.
-- category: "skill" for tools, languages and abilities; "experience" for years, internships
-  or domain work; "education" for degrees and certifications.
+- category:
+  - "skill": a tool, language, framework, technique or ability, INCLUDING phrasings like
+    "experience with Docker" or "hands-on with RAG" (hands-on use of a tool is a skill);
+  - "experience": only years of experience, internships, prior roles, or industry/domain work
+    (e.g. "1+ years", "worked in fintech", "shipped a product to users");
+  - "education": degrees, courses and certifications.
 - keywords: 1 to 3 exact tool, language, platform or qualification names as written in
   the job (e.g. "SQL", "Power BI", "FastAPI"). No generic phrases like "communication",
   "LLM APIs" or "vector databases". Use an empty list if there is no exact term.
