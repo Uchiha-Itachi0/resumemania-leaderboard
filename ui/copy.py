@@ -82,6 +82,8 @@ DIST_NOTE = "Readable, relevant resumes only."
 RANKED_TITLE = "Ranked candidates"
 RANKED_NOTE = "Students at or above the benchmark. Use this to plan guidance, not to reject."
 RANKED_EMPTY = "Nobody is at the benchmark yet."
+DASH_EMPTY = ("No resumes yet. Send students to the Check my rank page and ask them to pick this campaign. "
+              "This page fills in as each resume is scored.")
 PROBLEMS_TITLE = "Needs attention"
 PROBLEMS_NOTE = "These resumes couldn't be scored. The student sees the same reason."
 CHECKLIST_TITLE = "The checklist every resume is scored on"

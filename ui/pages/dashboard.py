@@ -114,6 +114,11 @@ def render() -> None:
                copy.DASH_TITLE.format(title=esc(campaign.title)),
                copy.DASH_SUB.format(benchmark=campaign.benchmark))
     html("<div style='height:18px'></div>")
+    if dash.submitted == 0:
+        st.info(copy.DASH_EMPTY)
+        with st.expander(copy.CHECKLIST_TITLE, expanded=True):
+            _checklist(campaign)
+        return
     _tiles(dash)
     html("<div style='height:16px'></div>")
     _distribution(dash)
@@ -122,8 +127,12 @@ def render() -> None:
     html("<div style='height:16px'></div>")
     _export(dash)
     with st.expander(copy.CHECKLIST_TITLE):
-        for req in campaign.job.requirements:
-            st.markdown(f"**{req.id}** {req.text} · _{copy.NEED_TEXT[req.priority.value]}, {req.category.value}_")
+        _checklist(campaign)
+
+
+def _checklist(campaign) -> None:
+    for req in campaign.job.requirements:
+        st.markdown(f"**{req.id}** {req.text} · _{copy.NEED_TEXT[req.priority.value]}, {req.category.value}_")
 
 
 render()

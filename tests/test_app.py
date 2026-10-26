@@ -132,3 +132,9 @@ def test_weights_must_total_100_before_creating():
     at.number_input(key="w_required").set_value(35).run()
     assert _button(at, copy.CTA_COORD).disabled
     assert "Total 95 of 100" in _md(at)
+
+
+def test_empty_dashboard_explains_next_step(jd_text):
+    at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
+    _create_campaign(at, jd_text)
+    assert copy.DASH_EMPTY in [i.value for i in at.info]

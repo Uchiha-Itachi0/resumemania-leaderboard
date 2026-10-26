@@ -45,6 +45,12 @@ python scripts/seed_campaigns.py
 
 That creates ten campaigns (Data Analyst, AI Engineer, Frontend, Java Backend, ML, Product Analyst, DevOps, Android, MERN and Cybersecurity) from `samples/jds/`. It takes a few seconds and is safe to run twice.
 
+To fill every campaign with results, submit all ten sample resumes to all ten campaigns (100 real checks, about 10 minutes):
+
+```bash
+python scripts/seed_resumes.py
+```
+
 The resumes are in `samples/resumes/` (eight PDFs, two DOCX). Each student fits one or two jobs well, and one is deliberately weak, so you see every status. To regenerate them somewhere else:
 
 ```bash
