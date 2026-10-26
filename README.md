@@ -33,7 +33,7 @@ streamlit run app.py
 
 1. **Coordinator:** open **Campaigns**, paste a job description and press **Start my campaign**. The job is read once, and that one checklist is used for every student.
 2. **Students:** open **Check my rank**, pick the campaign, upload a resume that includes a `github.com/your-username` link and press **Check my rank**.
-3. **Everyone:** **Leaderboard** shows the top 10%. **Dashboard** shows the coordinator the full ranked list, the score spread and any resumes that couldn't be read.
+3. **Everyone:** **Leaderboard** shows the top students (the share the coordinator picked). **Dashboard** shows the coordinator the full ranked list, the score spread and any resumes that couldn't be read.
 
 ## Try it with sample data
 
@@ -95,7 +95,7 @@ These rules live in `resumemania/ranking.py` and `resumemania/service.py`, outsi
 app.py                     Navigation: Home, Check my rank, Leaderboard, Campaigns, Dashboard
 resumemania/               Engine (shared with ResumeMania Personal, plus the files below)
   weighted.py              Five-part weighted score with weight redistribution
-  ranking.py               Eligibility, top 10% rounding, tie-breaks
+  ranking.py               Eligibility, public-share rounding, tie-breaks
   service.py               Campaigns, uploads, leaderboard and dashboard, with the privacy rules
   storage.py               SQLite: campaigns, submissions, evaluations, leaderboard snapshots
   github.py                Reads the student's GitHub username from their resume
