@@ -138,3 +138,33 @@ def test_empty_dashboard_explains_next_step(jd_text):
     at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
     _create_campaign(at, jd_text)
     assert copy.DASH_EMPTY in [i.value for i in at.info]
+
+
+def test_leaderboard_share_filter_changes_the_board(jd_text, resume_text):
+    at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
+    _create_campaign(at, jd_text)
+    at.switch_page("ui/pages/submit.py").run()
+    for handle in ("asha", "ben", "cara", "dev"):
+        at.text_area(key="resume_paste").set_value(f"{resume_text}\ngithub.com/{handle}")
+        _button(at, copy.CTA_STUDENT).click().run()
+    at.switch_page("ui/pages/leaderboard.py").run()
+    assert "Showing the top 10%: 1." in _md(at)
+    at.segmented_control[0].set_value(0.5).run()
+    assert not at.exception, at.exception
+    assert "Showing the top 50%: 2." in _md(at)
+    assert ui_state.service().campaigns()[0].public_share == 0.5
+
+
+def test_campaign_picker_switches_in_one_change(jd_text):
+    at = AppTest.from_file(APP, default_timeout=TIMEOUT).run()
+    _create_campaign(at, jd_text)
+    at.switch_page("ui/pages/campaigns.py").run()
+    next(t for t in at.text_input if t.label == copy.CAMP_TITLE).set_value("Second Campaign")
+    next(t for t in at.text_area if t.label == copy.CAMP_JD).set_value(jd_text)
+    _button(at, copy.CTA_COORD).click().run()
+    at.switch_page("ui/pages/leaderboard.py").run()
+    picker = at.selectbox(key="campaign_picker")
+    first = ui_state.service().campaigns()[-1]
+    picker.set_value(first.id).run()
+    assert f"Leaderboard · {first.title}".upper() in _md(at).upper()
+    assert at.selectbox(key="campaign_picker").value == first.id

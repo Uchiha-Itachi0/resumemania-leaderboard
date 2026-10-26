@@ -80,7 +80,11 @@ TILE_PUBLIC = "On public board"
 DIST_TITLE = "Score spread"
 DIST_NOTE = "Readable, relevant resumes only."
 RANKED_TITLE = "Ranked candidates"
-RANKED_NOTE = "Students at or above the benchmark. Use this to plan guidance, not to reject."
+RANKED_NOTE = ("Students at or above the benchmark. \"On public board\" means students see them on the Leaderboard; "
+               "\"Staff only\" means they're ranked but only you see them. Change the split with "
+               "\"Public leaderboard shows\" above. Use this list to plan guidance, not to reject.")
+BADGE_PUBLIC = "On public board"
+BADGE_PRIVATE = "Staff only"
 RANKED_EMPTY = "Nobody is at the benchmark yet."
 DASH_EMPTY = ("No resumes yet. Send students to the Check my rank page and ask them to pick this campaign. "
               "This page fills in as each resume is scored.")
@@ -127,9 +131,11 @@ BOARD_TITLE = "The top <em>{share}.</em>"
 BOARD_TITLE_ALL = "Everyone who made <em>the bar.</em>"
 BOARD_SUB = "{eligible} of {submitted} reached the {benchmark}% bar. Showing the top {share}: {shown}."
 SHARE_LABEL = "Public leaderboard shows"
-SHARE_HELP = "The PRD default is the top 10%. Everyone else at the benchmark is ranked privately."
+SHARE_HELP = ("The PRD default is the top 10%. Everyone else at the benchmark is ranked privately. "
+              "This is saved for the campaign, so everyone sees the same board.")
 SHARE_OPTIONS = {0.10: "Top 10% (default)", 0.25: "Top 25%", 0.50: "Top 50%", 1.0: "Everyone at the benchmark"}
 SHARE_SHORT = {0.10: "10%", 0.25: "25%", 0.50: "50%", 1.0: "100%"}
+SHARE_FILTER = {0.10: "Top 10%", 0.25: "Top 25%", 0.50: "Top 50%", 1.0: "Everyone"}
 SHARE_SAVED = "Saved. The public board now shows {label}."
 TILE_PUBLIC_SUB = "{label}, rounded up"
 BOARD_EMPTY = "Nobody is on the board yet. Check back after more resumes come in."

@@ -7,8 +7,15 @@ import streamlit as st
 from resumemania import github
 from ui import copy, state
 from ui.components import avatar, esc, html, page_title
-from ui.picker import pick_campaign
+from ui.picker import pick_campaign, share_control
 from ui.resume_view import resume_html
+
+
+def _share_filter(campaign):
+    """How many students this campaign's public board shows. Saved for everyone."""
+    fresh, _ = share_control(st.segmented_control, campaign, key=f"board_share_{campaign.id}",
+                             format_func=copy.SHARE_FILTER.get)
+    return fresh
 
 
 def render() -> None:
@@ -18,6 +25,7 @@ def render() -> None:
         page_title("Leaderboard", "The <em>leaderboard.</em>", copy.NO_CAMPAIGN_YET)
         return
     svc = state.service()
+    campaign = _share_filter(campaign)
     rows, eligible = svc.leaderboard(campaign.id)
     submitted = svc.dashboard(campaign.id).submitted
     share = campaign.public_share

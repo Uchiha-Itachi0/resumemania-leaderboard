@@ -10,6 +10,7 @@ from resumemania.ranking import DEFAULT_BENCHMARK
 from resumemania.weighted import DEFAULT_WEIGHTS, WEIGHT_TOTAL
 from ui import copy, state
 from ui.components import esc, html, page_title, pill
+from ui.picker import remember
 from ui.report_view import setup_card
 
 
@@ -56,7 +57,7 @@ def _create(title: str, jd: str, cohort: str, benchmark: int, weights: dict[str,
     except (IngestError, LLMError, ValueError) as exc:
         st.error(str(exc))
         return
-    st.session_state[state.CAMPAIGN_ID] = campaign.id
+    remember(campaign.id)
     state.flash(copy.CAMP_CREATED.format(title=campaign.title))
     st.switch_page("ui/pages/dashboard.py")
 
@@ -78,7 +79,7 @@ def _campaign_card(campaign) -> None:
                 f"</span></div>"
             )
         if right.button(copy.OPEN_DASHBOARD, key=f"open_{campaign.id}", use_container_width=True):
-            st.session_state[state.CAMPAIGN_ID] = campaign.id
+            remember(campaign.id)
             st.switch_page("ui/pages/dashboard.py")
 
 

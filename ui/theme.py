@@ -34,7 +34,7 @@ CSS = """
   --mono:'Geist Mono',ui-monospace,monospace;
 }
 .stApp{background:var(--page);color:var(--ink)}
-.block-container{max-width:1120px;padding-top:2.5rem;padding-bottom:5rem}
+.block-container{max-width:1120px;padding-top:4.5rem;padding-bottom:5rem}
 #MainMenu,footer,[data-testid="stStatusWidget"],.stDeployButton,[data-testid="stAppDeployButton"]{display:none!important}
 header[data-testid="stHeader"]{background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 
@@ -53,6 +53,12 @@ h1 em,h2 em,h3 em{font-family:var(--serif)!important;font-style:italic;font-weig
 .stButton>button[kind="tertiary"]{min-height:56px;font-size:17px;background:var(--graphite);color:#fff;border:none}
 .stButton>button[kind="tertiary"]:hover{background:#000;color:#fff}
 .stButton>button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+/* Segmented controls: selected option is a solid ink pill */
+button[data-variant="segmented_control"]{min-height:40px;font-weight:600;color:var(--body)}
+button[data-variant="segmented_control"][aria-checked="true"]{background:var(--ink)!important;color:#fff!important;
+  border-color:var(--ink)!important}
+button[data-variant="segmented_control"][aria-checked="true"] *{color:#fff!important}
 
 /* Inputs */
 .stTextArea textarea,.stTextInput input{background:var(--page);font-size:15px;color:var(--ink)}

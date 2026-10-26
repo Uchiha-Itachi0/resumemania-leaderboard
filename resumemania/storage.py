@@ -7,7 +7,7 @@ import sqlite3
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .schemas import Analysis, JobRequirements
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS leaderboard_snapshots (
 
 
 def now() -> str:
-    return datetime.now(UTC).isoformat(timespec="microseconds")
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
 
 
 @dataclass(frozen=True)

@@ -10,7 +10,7 @@ import streamlit as st
 from resumemania.service import Dashboard, NotAllowed
 from ui import copy, report_view, state
 from ui.components import esc, html, page_title, pill, stat_tile
-from ui.picker import pick_campaign
+from ui.picker import pick_campaign, share_control
 
 
 def _pick_campaign():
@@ -38,12 +38,10 @@ def _tiles(dash: Dashboard) -> None:
 
 
 def _share_control(dash: Dashboard) -> None:
-    options = list(copy.SHARE_OPTIONS)
-    current = dash.campaign.public_share
-    chosen = st.selectbox(copy.SHARE_LABEL, options, index=options.index(current), help=copy.SHARE_HELP,
-                          format_func=copy.SHARE_OPTIONS.get, key=f"share_{dash.campaign.id}")
-    if chosen != current:
-        state.service().set_public_share(dash.campaign.id, chosen)
+    _, changed = share_control(st.selectbox, dash.campaign, key=f"share_{dash.campaign.id}",
+                               format_func=copy.SHARE_OPTIONS.get)
+    if changed:
+        chosen = st.session_state[f"share_{dash.campaign.id}"]
         state.flash(copy.SHARE_SAVED.format(label=copy.SHARE_OPTIONS[chosen].lower()))
         st.rerun()
 
@@ -75,7 +73,7 @@ def _ranked(dash: Dashboard) -> None:
             cols = st.columns([0.6, 3, 1, 1.4], vertical_alignment="center")
             cols[0].markdown(f"<span class='rm-num' style='width:32px;height:32px'>{cand.rank}</span>",
                              unsafe_allow_html=True)
-            badge = pill("Public", "good") if cand.on_public_board else pill("Private", "mono")
+            badge = pill(copy.BADGE_PUBLIC, "good") if cand.on_public_board else pill(copy.BADGE_PRIVATE, "mono")
             cols[1].markdown(f"<strong style='font-size:17px'>@{esc(cand.github_username)}</strong> {badge}"
                              f"<div class='rm-muted'>Required skills {round(cand.required_component * 100)}%</div>",
                              unsafe_allow_html=True)

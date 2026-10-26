@@ -12,30 +12,99 @@ No accounts. A student's ID is the `github.com/username` link in their resume. U
 
 This is the cohort version of [ResumeMania Personal](https://github.com/Uchiha-Itachi0/resumemania-personal). It uses the same agents, validation gate and design, and adds campaigns, weighted scoring, eligibility and a leaderboard.
 
-## Start in 3 minutes
+## Setup
 
-You need Python 3.10 or newer and a free Gemini API key from [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+### 1. What you need
+
+| | How to check | Get it |
+|---|---|---|
+| Python 3.11 or newer | `python3 --version` (Windows: `py --version`) | [python.org/downloads](https://www.python.org/downloads/) |
+| Git | `git --version` | [git-scm.com](https://git-scm.com/downloads) |
+| A free Gemini API key | | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+
+### 2. Download the code
 
 ```bash
 git clone https://github.com/Uchiha-Itachi0/resumemania-leaderboard.git
 cd resumemania-leaderboard
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env             # Windows: copy .env.example .env
 ```
 
-Paste your key after `GEMINI_API_KEY=` in `.env`, then:
+### 3. Create a virtual environment and install
+
+**macOS or Linux**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Windows (PowerShell)**
+
+```powershell
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+If PowerShell says running scripts is disabled, skip `Activate.ps1` and put `.venv\Scripts\` in front of each command instead, for example `.venv\Scripts\python -m streamlit run app.py`.
+
+### 4. Add your Gemini key
+
+Copy the example settings file:
+
+```bash
+cp .env.example .env
+```
+
+On Windows: `copy .env.example .env`
+
+Open `.env` in any editor and paste your key after `GEMINI_API_KEY=` (no quotes, no spaces). `.env` is git-ignored, so your key is never committed.
+
+### 5. Run it
 
 ```bash
 streamlit run app.py
 ```
 
-1. **Coordinator:** open **Campaigns**, paste a job description and press **Start my campaign**. The job is read once, and that one checklist is used for every student.
-2. **Students:** open **Check my rank**, pick the campaign, upload a resume that includes a `github.com/your-username` link and press **Check my rank**.
-3. **Everyone:** **Leaderboard** shows the top students (the share the coordinator picked). **Dashboard** shows the coordinator the full ranked list, the score spread and any resumes that couldn't be read.
+Your browser opens http://localhost:8501.
 
-## Try it with sample data
+### 6. Load the sample data (optional, recommended)
+
+This creates ten sample job campaigns and fills them with 90 fictional students, so every page has something to show:
+
+```bash
+python scripts/seed_campaigns.py
+python scripts/seed_resumes.py
+```
+
+The first command reads the ten job descriptions in `samples/jds/` with Gemini (10 quick calls). The second runs **offline with no AI calls** in about 10 seconds. Both are safe to run again. See [Sample data](#sample-data) for details.
+
+### Using the app
+
+1. **Coordinator:** open **Campaigns**, paste a job description, choose the benchmark, the scoring weights and how many students the public board shows, then press **Start my campaign**. The job is read once, and that one checklist is used for every student.
+2. **Students:** open **Check my rank**, pick the campaign, upload a resume that includes a `github.com/your-username` link and press **Check my rank**.
+3. **Everyone:** **Leaderboard** shows the top students. **Dashboard** shows the coordinator the full ranked list, the score spread and any resumes that couldn't be read.
+
+### Next time
+
+You only install once. To start the app again, open a terminal in the project folder and run:
+
+```bash
+source .venv/bin/activate
+streamlit run app.py
+```
+
+On Windows: `.venv\Scripts\Activate.ps1`, then `streamlit run app.py`.
+
+### Get the latest version
+
+```bash
+git pull
+pip install -r requirements.txt
+```
+
+## Sample data
 
 Ten sample job descriptions and ten fictional student resumes come with the repo. Every name, email, phone number and GitHub username in them is made up.
 
@@ -120,11 +189,25 @@ tests/                     Unit, integration and end-to-end UI tests (no API key
 
 ## Run the tests
 
+With the virtual environment active:
+
 ```bash
 pip install -r requirements-dev.txt
 pytest --cov
 ruff check .
 ```
+
+## Troubleshooting
+
+| You see | Do this |
+|---|---|
+| `python3: command not found` | Install Python 3.11+. On Windows use `py` instead of `python3` |
+| `streamlit: command not found` | The virtual environment isn't active. Run `source .venv/bin/activate` (Windows: `.venv\Scripts\Activate.ps1`) |
+| `ModuleNotFoundError` | Run `pip install -r requirements.txt` with the virtual environment active |
+| `Port 8501 is already in use` | Another copy is running. Stop it, or run `streamlit run app.py --server.port 8502` |
+| "Add your Gemini key to start" | Create `.env` from `.env.example`, add your key, restart the app |
+| "Gemini is busy" | Google is overloaded or you hit the free rate limit. Wait a minute and try again |
+| "Add your GitHub profile link to your resume" | The resume needs a `github.com/your-username` link. It is the student's ID |
 
 ## Before real student data
 
