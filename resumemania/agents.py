@@ -57,7 +57,8 @@ def match_evidence(
 ) -> list[EvidenceMatch]:
     """Keyword/Evidence Matching Agent: find proof for each requirement."""
     checklist = json.dumps(
-        [{"id": r.id, "text": r.text, "priority": r.priority.value, "keywords": r.keywords}
+        [{"id": r.id, "text": r.text, "priority": r.priority.value, "category": r.category.value,
+          "keywords": r.keywords}
          for r in job.requirements],
         indent=1,
     )

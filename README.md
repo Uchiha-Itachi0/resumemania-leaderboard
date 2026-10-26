@@ -45,11 +45,13 @@ python scripts/seed_campaigns.py
 
 That creates ten campaigns (Data Analyst, AI Engineer, Frontend, Java Backend, ML, Product Analyst, DevOps, Android, MERN and Cybersecurity) from `samples/jds/`. It takes a few seconds and is safe to run twice.
 
-To fill every campaign with results, submit all ten sample resumes to all ten campaigns (100 real checks, about 10 minutes):
+To fill every campaign with results, submit all ten sample resumes to all ten campaigns. By default this runs **offline, with no AI calls**: a keyword-matching stand-in (`scripts/offline_llm.py`) replaces Gemini, and everything after it (validation gate, scoring, ranking, leaderboard) is the real code. It takes about 2 seconds:
 
 ```bash
 python scripts/seed_resumes.py
 ```
+
+Add `--live` to score them with real Gemini instead (about 400 calls, roughly 10 minutes on a free key). Offline scores are rougher than Gemini's, so use them for demos, never to judge real students.
 
 The resumes are in `samples/resumes/` (eight PDFs, two DOCX). Each student fits one or two jobs well, and one is deliberately weak, so you see every status. To regenerate them somewhere else:
 
